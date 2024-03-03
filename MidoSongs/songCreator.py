@@ -5,13 +5,13 @@ import mido
 #              C       D       E       F       G       A       B
 FREQUENCIES = [261.63, 293.66, 329.63, 349.23, 392.00, 440.00, 493.88]
 
-DURATION_QUARTER = 480
+DURATION_QUARTER = 100 #480
 DURATION_HALF = 2 * DURATION_QUARTER
 DURATION_WHOLE = 2 * DURATION_HALF
 
-MELODY_LENGTH = 4800 
+MELODY_LENGTH = 2400
 
-def generate_random_melody(length, num_notes=10, max_simultaneous_notes=3, seed=None):
+def generate_random_melody(length, num_notes=100, max_simultaneous_notes=10, seed=None):
     if seed is not None:
         random.seed(seed)
     
@@ -32,7 +32,22 @@ def generate_random_melody(length, num_notes=10, max_simultaneous_notes=3, seed=
     
     return melody
 
-# Melody generation part ----------------------------------------------------------------------------------------------------
+def save_combined_melody_as_midi(combined_melody, file_name):
+    midi = mido.MidiFile()
+    track = mido.MidiTrack()
+    midi.tracks.append(track)
+    for msg in combined_melody:
+        track.append(msg)
+    midi.save(file_name)
+    print(f"Combined melody saved as {file_name}")
+
+def save_combined_melody_as_text(combined_melody, file_name):
+    with open(file_name, 'w') as file:
+        for msg in combined_melody:
+            file.write(f"{msg}\n")
+    print(f"Combined melody array saved as {file_name}")
+
+# --- Melody generation part --------------------------------------------------------------------------------------
 num_melodies = 5
 combined_melody = []
 for i in range(num_melodies):
@@ -42,14 +57,8 @@ for i in range(num_melodies):
 combined_melody = sorted(combined_melody, key=lambda msg: msg.time)
 
 random_suffix = ''.join(random.choices('0123456789', k=6))
-file_name = f"Song_{random_suffix}.mid"
+midi_file_name = f"Song_{random_suffix}.mid"
+text_file_name = f"Song_{random_suffix}.txt"
 
-midi = mido.MidiFile()
-track = mido.MidiTrack()
-midi.tracks.append(track)
-for msg in combined_melody:
-    track.append(msg)
-
-midi.save(file_name)
-
-print(f"Combined melody saved as {file_name}")
+save_combined_melody_as_midi(combined_melody, midi_file_name)
+save_combined_melody_as_text(combined_melody, text_file_name)
